@@ -1,2 +1,6 @@
-const PORT = process.env.PORT
-console.log(PORT)
+const PORT = process.env.PORT;
+console.log(PORT);
+
+if(true){
+  console.log("error");
+}
