@@ -1,6 +1,11 @@
 const PORT = process.env.PORT;
-console.log(PORT);
+const express = require("express");
+const app = express();
 
-if(true){
-  console.log("error");
-}
+app.get("/", (req, res) => {
+  res.end("Hello, World");
+});
+
+app.listen(PORT, () => {
+  console.log(`Application listening at ${PORT}`);
+});
