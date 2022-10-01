@@ -4,13 +4,12 @@ const app = express();
 
 // ルーティング
 app.get("/", (req, res) => {
-  res.end("Hello, World");
+  res.send("Hello, World");
 });
 
-// ミドルウエア
-app.use(() => {
-  
-});
+// モジュール化したルーティングを読み込み
+app.use("/home", require("./routes/router.js"));
+
 
 app.listen(PORT, () => {
   console.log(`Application listening at ${PORT}`);
