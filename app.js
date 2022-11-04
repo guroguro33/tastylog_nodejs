@@ -7,6 +7,8 @@ const app = express();
 
 // Express setting 
 app.set("view engine", "ejs"); // お約束
+// セキュリティーのためレスポンスに含まれるx-powered-byを非表示にする
+app.disable("x-powered-by");
 
 // Static resource rooting
 // ファビコン
