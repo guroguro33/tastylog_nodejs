@@ -9,5 +9,6 @@ services:
       TZ: "Asia/Tokyo"
     volumes:
       - ./my.cnf:/etc/mysql/conf.d/my.cnf # MySQLの設定ファイル指定
+      - ./init:/docker-entrypoint-initdb.d # コンテナ作成時に走るシェルスクリプト指定
     ports:
       - "3306:3306"
