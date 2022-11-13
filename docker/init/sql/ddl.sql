@@ -15,7 +15,7 @@ DROP SCHEMA IF EXISTS `tastylog` ;
 -- -----------------------------------------------------
 -- Schema tastylog
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `tastylog` DEFAULT CHARACTER SET utf8mb4 DEFAULT COLLATE utf8mb4_general_ci ;
+CREATE SCHEMA IF NOT EXISTS `tastylog` DEFAULT CHARACTER SET utf8mb4 ;
 USE `tastylog` ;
 
 -- -----------------------------------------------------
