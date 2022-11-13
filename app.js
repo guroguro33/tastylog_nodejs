@@ -23,6 +23,41 @@ app.use(accesslogger());
 
 // Dynamic resource rooting.
 app.use("/", require("./routes/index.js"));
+app.use("/test", async (req, res, next) => {
+  // promisifyメソッドは引数に関数を入れるとpromise化してくれるnodeのutil
+  const { promisify } = require("util");
+  // パスの情報を返すクラス
+  const path = require("path");
+  // sqlを読み取って返す
+  const { sql } = require("@garafu/mysql-fileloader")({ root: path.join(__dirname, "./lib/database/sql") });
+  const config = require("./config/mysql.config.js");
+  const mysql = require("mysql");
+  const con = mysql.createConnection({
+    host: config.HOST,
+    port: config.PORT,
+    user: config.USERNAME,
+    password: config.PASSWORD,
+    database: config.DATABASE
+  });
+  // promisifyを使用してconのメソッドを非同期化
+  const client = {
+    connect: promisify(con.connect).bind(con),
+    query: promisify(con.query).bind(con),
+    end: promisify(con.end).bind(con)
+  };
+  var data;
+
+  try {
+    await client.connect();
+    data = await client.query(await sql("SELECT_SHOP_BASIC_BY_ID"));
+    console.log(data);
+  } catch (err) {
+    next(err);
+  } finally {
+    await client.end();
+  }
+  res.end("OK");
+});
 
 // Set application log.
 app.use(applicationlogger());
