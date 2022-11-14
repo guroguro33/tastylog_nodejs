@@ -13,6 +13,14 @@ app.set("view engine", "ejs"); // お約束
 // セキュリティーのためレスポンスに含まれるx-powered-byを非表示にする
 app.disable("x-powered-by");
 
+// Expose global method to view engine.
+app.use((req, res, next) => {
+  // テンプレートエンジンで使える関数を登録
+  res.locals.moment = require("moment");
+  res.locals.padding = require("./lib/math/math.js").padding;
+  next();
+});
+
 // Static resource rooting
 // ファビコン
 app.use(favicon(path.join(__dirname, "/public/favicon.ico")));
@@ -33,7 +41,7 @@ app.use("/test", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-  
+
   res.end("OK");
 });
 
