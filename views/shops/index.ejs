@@ -71,6 +71,11 @@
             </div>
             <div>
               <!-- shop review -->
+              <% for (let review of reviews) { %>
+                <% review.shop = id %> 
+                <!-- -をつけるのを忘れない、第２引数に変数を渡せる -->
+                <%- include("./review.ejs", review) %>  
+              <% } %>  
             </div>
           </div>
         </div>
