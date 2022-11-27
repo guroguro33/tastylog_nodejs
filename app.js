@@ -30,6 +30,7 @@ app.use("/public", express.static(path.join(__dirname, "/public"))); // __dirnam
 app.use(accesslogger());
 
 // Dynamic resource rooting.
+app.use("/search", require("./routes/search.js"));
 app.use("/shops", require("./routes/shops.js"));
 app.use("/", require("./routes/index.js"));
 
