@@ -21,7 +21,11 @@ router.get("/", async (req, res, next) => { // クエリパラメータ取得の
       );
     }
     
-    res.render("./search/list.ejs", { results }); // なぜオブジェクト？
+    res.render("./search/list.ejs", { 
+      // オブジェクトでもOK
+      keyword,
+      results
+    });
   } catch (err) {
     next(err);
   }
