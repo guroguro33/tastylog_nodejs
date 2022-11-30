@@ -1,30 +1,43 @@
+const MAX_ITEM_PER_PAGE = require("../config/application.config.js").search.MAX_ITEM_PER_PAGE;
 const router = require("express").Router();
 const { MySQLClient, sql } = require("../lib/database/client.js");
-const MAX_ITEMS = 5;
 
 router.get("/", async (req, res, next) => { // クエリパラメータ取得の場合は/だけでOK
+  let page = req.query.page ? parseInt(req.query.page) : 1;
   let keyword = req.query.keyword || "";
-  let results;
+  let count, results;
 
   try {
     if (keyword) {
+      count = (await MySQLClient.executeQuery(
+        await sql("COUNT_SHOP_BY_NAME"),
+        [`%${keyword}%`]
+      ))[0].count;
       results = await MySQLClient.executeQuery(
         await sql("SELECT_SHOP_LIST_BY_NAME"),
         [
           `%${keyword}%`,
-          MAX_ITEMS
+          (page - 1) * MAX_ITEM_PER_PAGE, // offset
+          MAX_ITEM_PER_PAGE               // limit
         ]
       );
     } else {
+      count = MAX_ITEM_PER_PAGE;
       results = await MySQLClient.executeQuery(
-        await sql("SELECT_SHOP_HIGH_SCORE_LIST"),[MAX_ITEMS]
+        await sql("SELECT_SHOP_HIGH_SCORE_LIST"),
+        [MAX_ITEM_PER_PAGE]
       );
     }
     
     res.render("./search/list.ejs", { 
       // オブジェクトでもOK
       keyword,
-      results
+      count,
+      results,
+      pagination: {
+        max: Math.ceil(count / MAX_ITEM_PER_PAGE),
+        current: page
+      }
     });
   } catch (err) {
     next(err);
