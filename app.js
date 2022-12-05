@@ -29,6 +29,10 @@ app.use("/public", express.static(path.join(__dirname, "/public"))); // __dirnam
 // Set access log.（静的コンテンツまでアクセスログは不要のため、静的ファイルの後に記述する）
 app.use(accesslogger());
 
+// Set middleware
+// フォームデータを読み込むため、urlencodedメソッドを使い、拡張をtrueとする
+app.use(express.urlencoded({ extended: true }));
+
 // Dynamic resource rooting.
 app.use("/account", require("./routes/account"));
 app.use("/search", require("./routes/search.js"));
