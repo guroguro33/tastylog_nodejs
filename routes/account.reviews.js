@@ -38,6 +38,14 @@ router.get("/regist/:shopId(\\d+)", async (req, res, next) => {
 });
 
 // 投稿確認画面
+router.post("/regist/:shopId(\\d+)", (req, res) => {
+  const review = createReviewData(req);
+  const { shopId, shopName } = req.body;
+
+  res.render("../views/account/reviews/regist-form.ejs", { shopId, shopName, review});
+});
+
+// 投稿確認画面
 router.post("/regist/confirm", (req, res) => {
   const review = createReviewData(req);
   const { shopId, shopName } = req.body;
