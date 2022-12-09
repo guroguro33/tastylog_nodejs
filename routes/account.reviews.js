@@ -75,4 +75,42 @@ router.post("/regist/confirm", (req, res) => {
   res.render("../views/account/reviews/regist-confirm.ejs", { shopId, shopName, review});
 });
 
+router.post("/regis/execute", async (req, res, next) => {
+  const error = validateReviewData(req);
+  const review = createReviewData(req);
+  const { shopId, shopName } = req.body;
+  const userId = 1; // TODO：ログイン機能実装後に更新
+  let transaction;
+
+  if (error) {
+    res.render("../views/account/reviews/regist-form.ejs", { error, shopId, shopName, review });
+    return;
+  }
+
+  try {
+    transaction = await MySQLClient.beginTransaction();
+    // SQL処理
+    // 悲観ロック
+    transaction.executeQuery(
+      await sql("SELECT_SHOP_BY_ID_FOR_UPDATE"),
+      [shopId]
+    );
+    transaction.executeQuery(
+      await sql("INSERT_SHOP_REVIEW"),
+      [shopId, userId, review.score, review.visit, review.description]
+    );
+    transaction.executeQuery(
+      await sql("UPDATE_SHOP_SCORE_BY_ID"),
+      [shopId, shopId]
+    );
+    await transaction.commit();
+  } catch (err) {
+    await transaction.rollback();
+    next(err);
+    return;
+  }
+
+  res.render("../views/account/reviews/regist-complete.ejs");
+});
+
 module.exports = router;
