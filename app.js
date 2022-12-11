@@ -6,6 +6,7 @@ const accesslogger = require("./lib/log/accesslogger.js");
 const applicationlogger = require("./lib/log/applicationlogger.js");
 const express = require("express");
 const favicon = require("serve-favicon");
+const cookie = require("cookie-parser");
 const app = express();
 
 // Express setting 
@@ -30,6 +31,8 @@ app.use("/public", express.static(path.join(__dirname, "/public"))); // __dirnam
 app.use(accesslogger());
 
 // Set middleware
+// cookie
+app.use(cookie());
 // フォームデータを読み込むため、urlencodedメソッドを使い、拡張をtrueとする
 app.use(express.urlencoded({ extended: true }));
 
