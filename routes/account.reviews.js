@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { MySQLClient, sql } = require("../lib/database/client.js");
 const moment = require("moment");
+const tokens = new (require("csrf"))();
 const DATE_FORMAT = "YYYY/MM/DD";
 
 // バリデーションチェック（日付）
@@ -34,7 +35,12 @@ const createReviewData = function (req) {
 // 投稿画面
 router.get("/regist/:shopId(\\d+)", async (req, res, next) => {
   let shopId = req.params.shopId;
-  let shop, shopName, review, results;
+  let secret, token, shop, shopName, review, results;
+
+  secret = await tokens.secret();
+  token = tokens.create(secret);
+  req.session._csrf = secret;
+  res.cookie("_csrf", token);
 
   try {
     results = await MySQLClient.executeQuery(
@@ -53,7 +59,7 @@ router.get("/regist/:shopId(\\d+)", async (req, res, next) => {
   }
 });
 
-// 投稿確認画面
+// 投稿画面
 router.post("/regist/:shopId(\\d+)", (req, res) => {
   const review = createReviewData(req);
   const { shopId, shopName } = req.body;
@@ -76,6 +82,16 @@ router.post("/regist/confirm", (req, res) => {
 });
 
 router.post("/regist/execute", async (req, res, next) => {
+  // sessionからsecretを取り出す
+  let secret = req.session._csrf;
+  // cookieからtokenを取り出す
+  let token = req.cookies._csrf;
+
+  if (tokens.verify(secret, token) === false) {
+    next(new Error("Invalid Token."));
+    return;
+  }
+
   const error = validateReviewData(req);
   const review = createReviewData(req);
   const { shopId, shopName } = req.body;
@@ -108,6 +124,10 @@ router.post("/regist/execute", async (req, res, next) => {
     await transaction.rollback();
     next(err);
   }
+
+  // csrfのsecretとtokenを削除
+  delete req.session._csrf;
+  res.clearCookie("_csrf");
 
   res.render("../views/account/reviews/regist-complete.ejs", { shopId });
 });
