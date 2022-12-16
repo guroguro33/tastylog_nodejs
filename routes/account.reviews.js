@@ -129,7 +129,12 @@ router.post("/regist/execute", async (req, res, next) => {
   delete req.session._csrf;
   res.clearCookie("_csrf");
 
-  res.render("../views/account/reviews/regist-complete.ejs", { shopId });
+  res.redirect(`/account/reviews/regist/complete?shopId=${shopId}`);
+});
+
+// 登録完了を分けて、F5再送信を防ぐ
+router.get("/regist/complete", (req, res) => {
+  res.render("../views/account/reviews/regist-complete.ejs", { shopId: req.query.shopId });
 });
 
 module.exports = router;
