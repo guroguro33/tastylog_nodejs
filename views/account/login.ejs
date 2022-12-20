@@ -34,6 +34,9 @@
               <input type="submit" class="btn btn-primary" value="login">
             </div>
           </div>
+          <% if (message && message.length !== 0 ) { %> 
+            <div class="alert alert-danger"><%= message %></div>
+          <% } %> 
         </form>
       </div>
     </main>
