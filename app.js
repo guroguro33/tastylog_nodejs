@@ -1,3 +1,4 @@
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 const appconfig = require("./config/application.config.js");
 const dbconfig = require("./config/mysql.config.js");
 // pathモジュールを読み込む プロジェクトの様々なpathを取得するメソッドが使える
@@ -49,6 +50,10 @@ app.use(session({
     password: dbconfig.PASSWORD,
     database: dbconfig.DATABASE
   }),
+  cookie: {
+    // HTTPS通信に限定するか（prodのみHTTPS）
+    secure: IS_PRODUCTION
+  },
   // secretは必須
   secret: appconfig.security.SESSION_SECRET,
   // 強制保存
