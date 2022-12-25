@@ -13,6 +13,11 @@ router.get("/login", (req, res) => {
 
 router.post("/login", authenticate());
 
+router.post("/logout", (req, res) => {
+  req.logout();
+  res.redirect("/account/login");
+});
+
 // account.reviews.jsのルーティングを読み込む
 // account/reviews/~のルーティングになる
 router.use("/reviews", authorize(PRIVILEGE.NORMAL), require("./account.reviews.js"));
