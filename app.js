@@ -58,8 +58,8 @@ app.use(session({
   secret: appconfig.security.SESSION_SECRET,
   // 強制保存
   resave: false,
-  // 未初期化のセッションを保存するかどうか
-  saveUninitialized: true,
+  // 未初期化のセッションを保存するかどうか（Cookie Consent回答前にsessionをはらないようにする）
+  saveUninitialized: false,
   // セッション名
   name: "sid"
 }));
