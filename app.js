@@ -16,7 +16,7 @@ const MySQLStore = require("express-mysql-session")(session);
 const flash = require("connect-flash");
 const app = express();
 
-// Express setting 
+// Express settings
 app.set("view engine", "ejs"); // お約束
 // セキュリティーのためレスポンスに含まれるx-powered-byを非表示にする
 app.disable("x-powered-by");
@@ -74,18 +74,30 @@ app.use("/", (() => {
   const router = express.Router();
   // ヘッダーにx-frame-optionsを追加する
   router.use((req, res, next) => {
-    res.setHeader("X-Frame-Options", "SAMEORIGIN");   
-    next(); 
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    next();
   });
   router.use("/account", require("./routes/account"));
   router.use("/search", require("./routes/search.js"));
   router.use("/shops", require("./routes/shops.js"));
+  router.use("/test", (req, res) => { throw new Error("test error"); });
   router.use("/", require("./routes/index.js"));
   return router;
 })());
 
 // Set application log.
 app.use(applicationlogger());
+
+// Custom Error page
+app.use((req, res) => {
+  res.status(404);
+  res.render("./404.ejs");
+});
+// nextを引数に入れないと、500ページに遷移せず、エラー表示されるだけだったので入れること
+app.use((err, req, res, next) => {
+  res.status(500);
+  res.render("./500.ejs");
+});
 
 // Execute web application.
 app.listen(appconfig.PORT, () => {
