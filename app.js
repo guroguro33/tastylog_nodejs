@@ -69,11 +69,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(flash());
 app.use(...accesscontrol.initialize());
 
-// Dynamic resource rooting.
-app.use("/account", require("./routes/account"));
-app.use("/search", require("./routes/search.js"));
-app.use("/shops", require("./routes/shops.js"));
-app.use("/", require("./routes/index.js"));
+// Dynamic resource rooting
+app.use("/", (() => {
+  const router = express.Router();
+  // ヘッダーにx-frame-optionsを追加する
+  router.use((req, res, next) => {
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");   
+    next(); 
+  });
+  router.use("/account", require("./routes/account"));
+  router.use("/search", require("./routes/search.js"));
+  router.use("/shops", require("./routes/shops.js"));
+  router.use("/", require("./routes/index.js"));
+  return router;
+})());
 
 // Set application log.
 app.use(applicationlogger());
