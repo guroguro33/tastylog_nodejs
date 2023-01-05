@@ -14,6 +14,7 @@ const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
 // エラーメッセージを画面上に表示させるツール
 const flash = require("connect-flash");
+const gracefulShutdown = require("http-graceful-shutdown");
 const app = express();
 
 // Express settings
@@ -100,6 +101,31 @@ app.use((err, req, res, next) => {
 });
 
 // Execute web application.
-app.listen(appconfig.PORT, () => {
+let server = app.listen(appconfig.PORT, () => {
   logger.application.info(`Application listening at :${appconfig.PORT}`);
+});
+
+// Graceful shutdown
+gracefulShutdown(server, {
+  // どのシグナルを受け付けるか
+  signals: "SIGINT SIGTERM",
+  timeout: 10000, 
+  onShutdown: () => {
+    // gracefulShutdownの返り値はPromise
+    return new Promise((resolve, reject) => {
+      const { pool } = require("./lib/database/pool.js");
+      // コネプをendさせてエラーハンドリング
+      pool.end((err) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve();
+      });
+    });
+  },
+  // シャットダウン完了後の処理
+  finally: () => {
+    const logger = require("./lib/log/logger.js").application;
+    logger.info("Application shutdown finished.");
+  }
 });
